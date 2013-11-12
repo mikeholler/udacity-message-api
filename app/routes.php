@@ -15,3 +15,6 @@ Route::get('/', function()
 {
 	return View::make('hello');
 });
+
+Route::resource('user', 'UserController', ['only' => ['index', 'show', 'store', 'destroy']]);
+Route::resource('group', 'GroupController', ['only' => ['index', 'show', 'store', 'destroy']]);
