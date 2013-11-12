@@ -10,7 +10,7 @@ class UserModel {
     protected $table;
 
     public function __construct() {
-        $this->table = DB::table(UserModel::TABLE);
+        $this->table = DB::table(self::TABLE);
     }
 
     public function getAll() {

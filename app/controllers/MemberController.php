@@ -2,8 +2,14 @@
 
 class MemberController extends \BaseController {
 
+    protected $memberModel;
+
+    public function __construct() {
+        $this->memberModel = new MemberModel;
+    }
+
 	/**
-	 * Display a listing of the resource.
+	 * List all members in a given group.
      *
      * @param int $groupId
 	 *
@@ -11,11 +17,11 @@ class MemberController extends \BaseController {
 	 */
 	public function index($groupId)
 	{
-		//
+        return Response::json($this->memberModel->getAll($groupId));
 	}
 
 	/**
-	 * Update the specified resource in storage.
+	 * Add user to a given group.
 	 *
 	 * @param int $groupId
      * @param int $memberId
@@ -24,11 +30,11 @@ class MemberController extends \BaseController {
 	 */
 	public function update($groupId, $memberId)
 	{
-		//
+        $this->memberModel->add($groupId, $memberId);
 	}
 
 	/**
-	 * Remove the specified resource from storage.
+	 * Remove user from given group.
 	 *
 	 * @param  int  $groupId
      * @param int $memberId
@@ -37,7 +43,7 @@ class MemberController extends \BaseController {
 	 */
 	public function destroy($groupId, $memberId)
 	{
-		//
+        $this->memberModel->remove($groupId, $memberId);
 	}
 
 }

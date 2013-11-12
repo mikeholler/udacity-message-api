@@ -10,7 +10,7 @@ class GroupModel {
     protected $table;
 
     public function __construct() {
-        $this->table = DB::table(GroupModel::TABLE);
+        $this->table = DB::table(self::TABLE);
     }
 
     public function getAll() {

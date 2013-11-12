@@ -2,6 +2,12 @@
 
 class InboxController extends \BaseController {
 
+    protected $indexModel;
+
+    public function __construct() {
+        $this->indexModel = new IndexModel;
+    }
+
 	/**
 	 * Display a listing of the resource.
 	 *
