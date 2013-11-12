@@ -17,4 +17,6 @@ Route::get('/', function()
 });
 
 Route::resource('user', 'UserController', ['only' => ['index', 'show', 'store', 'destroy']]);
+Route::resource('user.inbox', 'InboxController', ['only' => ['index', 'show', 'destroy']]);
 Route::resource('group', 'GroupController', ['only' => ['index', 'show', 'store', 'destroy']]);
+Route::resource('group.member', 'MemberController', ['only' => ['index', 'update', 'destroy']]);

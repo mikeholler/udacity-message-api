@@ -1,16 +1,16 @@
 <?php
 
-class UserModel {
+class GroupModel {
 
-    const TABLE = 'user';
-    const USER_ID = 'userId';
-    const USERNAME = 'username';
+    const TABLE = 'group';
+    const GROUP_ID = 'groupId';
+    const GROUP_NAME = 'gname';
     const CREATED = 'created';
 
     protected $table;
 
     public function __construct() {
-        $this->table = DB::table(UserModel::TABLE);
+        $this->table = DB::table(GroupModel::TABLE);
     }
 
     public function getAll() {
@@ -18,18 +18,17 @@ class UserModel {
     }
 
     public function getOne($id) {
-        return $this->table->where(self::USER_ID, $id)->first();
+        return $this->table->where(self::GROUP_ID, $id)->first();
     }
 
-    public function create($username) {
+    public function create($groupName) {
         return $this->table->insertGetId([
-            self::USERNAME => $username,
+            self::GROUP_NAME => $groupName,
             self::CREATED => TimeHelper::formattedUtcDatetime()
         ]);
     }
 
     public function delete($id) {
-        return $this->table->where(self::USER_ID, $id)->delete();
+        return $this->table->where(self::GROUP_ID, $id)->delete();
     }
-
 }
