@@ -4,7 +4,7 @@ class GroupModel extends BaseModel {
 
     const TABLE = 'group';
     const GROUP_ID = 'groupId';
-    const GROUP_NAME = 'gname';
+    const GROUP_NAME = 'groupName';
     const CREATED = 'created';
 
     protected $table;

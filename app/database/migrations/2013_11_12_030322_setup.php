@@ -22,7 +22,7 @@ class Setup extends Migration {
 
         Schema::create('group', function(Blueprint $table) {
             $table->increments('groupId');
-            $table->string('gname')->unique();
+            $table->string('groupName')->unique();
             $table->dateTime('created');
 
             $table->engine = 'InnoDB';

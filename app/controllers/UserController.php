@@ -33,23 +33,30 @@ class UserController extends \BaseController {
 	/**
 	 * Display the specified resource.
 	 *
-	 * @param  int  $id
+     * @param int $userId
+     *
 	 * @return Response
 	 */
-	public function show($id)
+	public function show($userId)
 	{
-        return Response::json($this->userModel->getOne($id));
+        return Response::json($this->userModel->getOne($userId));
 	}
+
+    public function showGroups($userId)
+    {
+        return Response::json($this->userModel->getGroups($userId));
+    }
 
 	/**
 	 * Remove the specified resource from storage.
 	 *
-	 * @param  int  $id
+	 * @param int $userId
+     *
 	 * @return Response
 	 */
-	public function destroy($id)
+	public function destroy($userId)
 	{
-        $this->userModel->delete($id);
+        $this->userModel->delete($userId);
 	}
 
 }

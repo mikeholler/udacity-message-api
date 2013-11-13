@@ -7,6 +7,9 @@ class UserModel extends BaseModel {
     const USERNAME = 'username';
     const CREATED = 'created';
 
+    /**
+     * @var \Illuminate\Database\Query\Builder
+     */
     protected $table;
 
     public function __construct() {
@@ -15,6 +18,25 @@ class UserModel extends BaseModel {
 
     public function getAll() {
         return $this->table->get();
+    }
+
+    /**
+     * Get all groups a user belongs to.
+     *
+     * @param int $userId
+     */
+    public function getGroups($userId) {
+        return DB::table(MemberModel::TABLE)
+            ->join(
+                GroupModel::TABLE,
+                self::qualify([MemberModel::TABLE, GroupModel::GROUP_ID]),
+                '=',
+                self::qualify([GroupModel::TABLE, GroupModel::GROUP_ID]))
+            ->where(self::qualify([MemberModel::TABLE, MemberModel::USER_ID]), $userId)
+            ->get([
+                self::qualify([MemberModel::TABLE, MemberModel::GROUP_ID]),
+                self::qualify([GroupModel::TABLE, GroupModel::GROUP_NAME])
+            ]);
     }
 
     public function getOne($id) {
