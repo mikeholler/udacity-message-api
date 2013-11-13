@@ -2,10 +2,10 @@
 
 class InboxController extends \BaseController {
 
-    protected $indexModel;
+    protected $inboxModel;
 
     public function __construct() {
-        $this->indexModel = new IndexModel;
+        $this->inboxModel = new MessageModel;
     }
 
 	/**
@@ -17,7 +17,7 @@ class InboxController extends \BaseController {
 	 */
 	public function index($userId)
 	{
-        echo "$userId";
+        return Response::json($this->inboxModel->getInbox($userId));
 	}
 
 	/**
@@ -29,7 +29,7 @@ class InboxController extends \BaseController {
 	 */
 	public function show($userId, $messageId)
 	{
-        echo "$userId, $messageId";
+        return Response::json($this->inboxModel->getMessage($userId, $messageId));
 	}
 
 	/**
@@ -42,7 +42,7 @@ class InboxController extends \BaseController {
 	 */
 	public function destroy($userId, $messageId)
 	{
-		//
+        $this->inboxModel->deleteMessage($userId, $messageId);
 	}
 
 }

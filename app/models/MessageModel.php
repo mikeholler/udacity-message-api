@@ -1,5 +1,7 @@
 <?php
 
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+
 /**
  * Message inbox.
  *
@@ -95,9 +97,7 @@ class MessageModel extends BaseModel {
             if ($offset) $query = $query->offset($offset);
         }
 
-        return $query->get(
-            [self::ATTR_MESSAGE_ID, self::ATTR_FROM_USER, self::ATTR_SUBJECT, self::ATTR_READ, self::ATTR_CREATED]
-        );
+        return $query->get();
     }
 
     /**
@@ -107,14 +107,14 @@ class MessageModel extends BaseModel {
      *
      * @param int $userId
      * @param int $messageId
+     *
+     * @throws NotFoundHttpException
      */
     public function getMessage($userId, $messageId) {
 
-        $message = null;
-
-        return DB::transaction(function() use ($userId, $messageId, $message){
+        return DB::transaction(function() use ($userId, $messageId){
             $this->markRead($userId, $messageId);
-            $this->tableMessageSend
+            $messages = $this->tableMessageSend
                 ->join(
                     self::TABLE_MESSAGE_RECEIVE,
                     self::qualify([self::TABLE_MESSAGE_SEND, self::ATTR_MESSAGE_ID]),
@@ -126,7 +126,12 @@ class MessageModel extends BaseModel {
                     '=',
                     self::qualify([self::TABLE_MESSAGE_BODY, self::ATTR_MESSAGE_ID]))
                 ->where(self::qualify([self::TABLE_MESSAGE_RECEIVE, self::ATTR_MESSAGE_ID]), $messageId)
-                ->where(self::qualify([self::TABLE_MESSAGE_RECEIVE, self::ATTR_TO_USER]), $userId);
+                ->where(self::qualify([self::TABLE_MESSAGE_RECEIVE, self::ATTR_TO_USER]), $userId)
+                ->get();
+
+            if (!$messages) throw new NotFoundHttpException;
+
+            return $messages;
         });
     }
 
@@ -151,12 +156,16 @@ class MessageModel extends BaseModel {
      *
      * @param int $userId
      * @param int $messageId
+     *
+     * @throws NotFoundHttpException
      */
     protected function markRead($userId, $messageId) {
-        $this->tableMessageReceive
+        $rowsModified = $this->tableMessageReceive
             ->where(self::ATTR_TO_USER, $userId)
             ->where(self::ATTR_MESSAGE_ID, $messageId)
             ->update([self::ATTR_READ => true]);
+
+        if (!$rowsModified) throw new NotFoundHttpException;
     }
 
 }
