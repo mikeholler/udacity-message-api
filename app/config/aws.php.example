@@ -1,0 +1,6 @@
+<?php
+
+return array(
+    'key' => 'ACCESS-KEY-HERE',
+    'secret' => 'SECRET-ACCESS-KEY-HERE'
+);

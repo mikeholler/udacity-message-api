@@ -45,22 +45,11 @@ class Setup extends Migration {
             $table->engine = 'InnoDB';
         });
 
-        Schema::create('messageBody', function(Blueprint $table) {
-            $table->increments('bodyId');
-            $table->mediumText('body');
-
-            $table->engine = 'InnoDB';
-        });
-
-        Schema::create('message', function(Blueprint $table) {
+        Schema::create('messageSend', function(Blueprint $table) {
             $table->increments('messageId');
-            $table->unsignedInteger('bodyId');
             $table->unsignedInteger('fromUser');
+            $table->string('subject');
             $table->dateTime('created');
-
-            $table->foreign('bodyId')
-                ->references('bodyId')
-                ->on('messageBody');
 
             $table->foreign('fromUser')
                 ->references('userId')
@@ -69,20 +58,31 @@ class Setup extends Migration {
             $table->engine = 'InnoDB';
         });
 
-        Schema::create('userMessage', function(Blueprint $table) {
+        Schema::create('messageBody', function(Blueprint $table) {
+            $table->increments('messageId');
+            $table->mediumText('body');
+
+            $table->foreign('messageId')
+                ->references('messageId')
+                ->on('messageSend');
+
+            $table->engine = 'InnoDB';
+        });
+
+        Schema::create('messageReceive', function(Blueprint $table) {
             $table->unsignedInteger('messageId');
-            $table->unsignedInteger('userId');
+            $table->unsignedInteger('toUser');
             $table->boolean('read');
 
             $table->foreign('messageId')
                 ->references('messageId')
-                ->on('message');
+                ->on('messageSend');
 
-            $table->foreign('userId')
+            $table->foreign('toUser')
                 ->references('userId')
                 ->on('user');
 
-            $table->primary(['messageId', 'userId']);
+            $table->primary(['messageId', 'toUser']);
 
             $table->engine = 'InnoDB';
         });
@@ -95,12 +95,12 @@ class Setup extends Migration {
 	 */
 	public function down()
 	{
-        Schema::drop('userMessage');
-        Schema::drop('messageBody');
-        Schema::drop('message');
-        Schema::drop('groupMember');
-        Schema::drop('group');
-        Schema::drop('user');
+        Schema::dropIfExists('groupMember');
+        Schema::dropIfExists('group');
+        Schema::dropIfExists('messageReceive');
+        Schema::dropIfExists('messageBody');
+        Schema::dropIfExists('messageSend');
+        Schema::dropIfExists('user');
 	}
 
 }

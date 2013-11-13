@@ -1,6 +1,6 @@
 <?php
 
-class MemberModel {
+class MemberModel extends BaseModel {
 
     const TABLE = 'groupMember';
     const GROUP_ID = 'groupId';

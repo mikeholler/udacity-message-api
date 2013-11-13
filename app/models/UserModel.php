@@ -1,6 +1,6 @@
 <?php
 
-class UserModel {
+class UserModel extends BaseModel {
 
     const TABLE = 'user';
     const USER_ID = 'userId';
