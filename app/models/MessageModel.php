@@ -127,7 +127,7 @@ class MessageModel extends BaseModel {
                     self::qualify([self::TABLE_MESSAGE_BODY, self::ATTR_MESSAGE_ID]))
                 ->where(self::qualify([self::TABLE_MESSAGE_RECEIVE, self::ATTR_MESSAGE_ID]), $messageId)
                 ->where(self::qualify([self::TABLE_MESSAGE_RECEIVE, self::ATTR_TO_USER]), $userId)
-                ->get();
+                ->first();
 
             if (!$messages) throw new NotFoundHttpException;
 
@@ -160,12 +160,10 @@ class MessageModel extends BaseModel {
      * @throws NotFoundHttpException
      */
     protected function markRead($userId, $messageId) {
-        $rowsModified = $this->tableMessageReceive
+        $this->tableMessageReceive
             ->where(self::ATTR_TO_USER, $userId)
             ->where(self::ATTR_MESSAGE_ID, $messageId)
             ->update([self::ATTR_READ => true]);
-
-        if (!$rowsModified) throw new NotFoundHttpException;
     }
 
 }

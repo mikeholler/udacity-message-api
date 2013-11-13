@@ -1,5 +1,7 @@
 <?php
 
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+
 class UserModel extends BaseModel {
 
     const TABLE = 'user';
@@ -39,8 +41,12 @@ class UserModel extends BaseModel {
             ]);
     }
 
-    public function getOne($id) {
-        return $this->table->where(self::USER_ID, $id)->first();
+    public function getOne($userId) {
+        $user = $this->table->where(self::USER_ID, $userId)->first();
+
+        if (!$user) throw new NotFoundHttpException;
+
+        return $user;
     }
 
     public function create($username) {

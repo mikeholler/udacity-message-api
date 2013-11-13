@@ -1,10 +1,14 @@
 <?php
 
-class GroupController extends \BaseController {
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+
+class GroupController extends \BaseController
+{
 
     protected $groupModel;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->groupModel = new GroupModel;
     }
 
@@ -22,10 +26,14 @@ class GroupController extends \BaseController {
      * Store a newly created resource in storage.
      *
      * @return Response
+     * @throws BadRequestHttpException
      */
     public function store()
     {
-        $groupName = Input::get('groupName');
+        if (Input::has('groupName'))
+            $groupName = Input::get('groupName');
+        else
+            throw new BadRequestHttpException('groupName missing');
 
         $this->groupModel->create($groupName);
     }
@@ -33,7 +41,7 @@ class GroupController extends \BaseController {
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return Response
      */
     public function show($id)
@@ -44,7 +52,7 @@ class GroupController extends \BaseController {
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return Response
      */
     public function destroy($id)

@@ -1,5 +1,7 @@
 <?php
 
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+
 class GroupModel extends BaseModel {
 
     const TABLE = 'group';
@@ -18,7 +20,11 @@ class GroupModel extends BaseModel {
     }
 
     public function getOne($id) {
-        return $this->table->where(self::GROUP_ID, $id)->first();
+        $group = $this->table->where(self::GROUP_ID, $id)->first();
+
+        if (!$group) throw new NotFoundHttpException;
+
+        return $group;
     }
 
     public function create($groupName) {

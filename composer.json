@@ -12,6 +12,7 @@
 			"app/controllers",
             "app/helpers",
 			"app/models",
+            "app/models/structs",
 			"app/database/migrations",
 			"app/database/seeds",
             "app/bindings",

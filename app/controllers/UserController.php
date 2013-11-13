@@ -1,5 +1,7 @@
 <?php
 
+use \Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+
 class UserController extends \BaseController {
 
     protected $userModel;
@@ -22,10 +24,14 @@ class UserController extends \BaseController {
 	 * Store a newly created resource in storage.
 	 *
 	 * @return Response
+     * @throws BadRequestHttpException
 	 */
 	public function store()
 	{
-        $username = Input::get('username');
+        if (Input::has('username'))
+            $username = Input::get('username');
+        else
+            throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
         $this->userModel->create($username);
 	}
