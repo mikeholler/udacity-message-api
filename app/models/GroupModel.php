@@ -1,6 +1,7 @@
 <?php
 
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class GroupModel extends BaseModel {
 
@@ -36,10 +37,18 @@ class GroupModel extends BaseModel {
     }
 
     public function create($groupName) {
-        return $this->table->insertGetId([
-            self::GROUP_NAME => $groupName,
-            self::CREATED => TimeHelper::formattedUtcDatetime()
-        ]);
+
+        try
+        {
+            return $this->table->insertGetId([
+                self::GROUP_NAME => $groupName,
+                self::CREATED => TimeHelper::formattedUtcDatetime()
+            ]);
+        }
+        catch (Exception $e)
+        {
+            throw new AccessDeniedHttpException;
+        }
     }
 
     public function delete($id) {

@@ -1,6 +1,7 @@
 <?php
 
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class UserModel extends BaseModel {
 
@@ -81,10 +82,18 @@ class UserModel extends BaseModel {
     }
 
     public function create($username) {
-        return $this->table->insertGetId([
-            self::USERNAME => $username,
-            self::CREATED => TimeHelper::formattedUtcDatetime()
-        ]);
+
+        try
+        {
+            return $this->table->insertGetId([
+                self::USERNAME => $username,
+                self::CREATED => TimeHelper::formattedUtcDatetime()
+            ]);
+        }
+        catch (Exception $e)
+        {
+            throw new AccessDeniedHttpException;
+        }
     }
 
     public function delete($id) {

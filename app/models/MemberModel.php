@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Query\Builder;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class MemberModel extends BaseModel {
 
@@ -64,11 +65,20 @@ class MemberModel extends BaseModel {
      *
      * @param int $groupId
      * @param int $userId
+     *
+     * @throws AccessDeniedHttpException
      */
     public function add($groupId, $userId) {
-        $this->table->insert(
-            [self::GROUP_ID, self::USER_ID]
-        );
+        try
+        {
+            $this->table->insert(
+                [self::GROUP_ID => $groupId, self::USER_ID => $userId]
+            );
+        }
+        catch (Exception $e)
+        {
+            throw new AccessDeniedHttpException;
+        }
     }
 
     /**
