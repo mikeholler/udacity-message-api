@@ -1,6 +1,7 @@
 <?php
 
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * Message inbox.
@@ -149,6 +150,157 @@ class MessageModel extends BaseModel {
             ->where(self::ATTR_TO_USER, $userId)
             ->where(self::ATTR_MESSAGE_ID, $messageId)
             ->delete();
+    }
+
+    /**
+     * Send a message as the given user.
+     *
+     * @param int $userId
+     * @param SendMessageStruct $message
+     */
+    public function sendMessage($userId, SendMessageStruct $message) {
+        DB::transaction(function () use ($userId, $message) {
+
+            // Create the outbox entry and message body. There is only
+            // one of each for each message.
+            $messageId = $this->createSenderMessage($userId, $message);
+            $this->createMessageBody($messageId, $message->body);
+
+
+            if ($message->broadcast)
+            {
+                $this->deliverBroadcastMessage($messageId, $userId);
+            }
+            else if ($message->toGroups)
+            {
+                $this->deliverGroupMessage($messageId, $message->toGroups);
+//                $this->deliverMessage($messageId, $message->toUsers, $message->toGroups);
+            }
+            else
+            {
+                $this->deliverUserMessage($messageId, $message->toUsers);
+            }
+        });
+    }
+
+    /**
+     * Create the "outbox" message entry for the sender.
+     *
+     * @param int $userId
+     * @param SendMessageStruct $message
+     *
+     * @return int messageId
+     */
+    protected function createSenderMessage($userId, SendMessageStruct $message) {
+        return $this->tableMessageSend->insertGetId(
+            [
+                self::ATTR_FROM_USER => $userId,
+                self::ATTR_SUBJECT => $message->subject,
+                self::ATTR_CREATED => TimeHelper::formattedUtcDatetime()
+            ]
+        );
+    }
+
+    /**
+     * Store the message body in one place.
+     *
+     * @param int $messageId
+     * @param string $body
+     */
+    protected function createMessageBody($messageId, $body) {
+        $this->tableMessageBody->insert(
+            [
+                self::ATTR_MESSAGE_ID => $messageId,
+                self::ATTR_BODY => $body
+            ]
+        );
+    }
+
+    protected function getAffectedRows() {
+        return DB::select('SELECT ROW_COUNT() as count')[0]->count;
+    }
+
+    /**
+     * Put an entry in every users' inbox (except the sender's) for a particular message.
+     *
+     * @param int $messageId
+     * @param int $fromUserId
+     *
+     * @throws BadRequestHttpException
+     */
+    protected function deliverBroadcastMessage($messageId, $fromUserId) {
+        $columns = [self::ATTR_MESSAGE_ID, self::ATTR_TO_USER, self::ATTR_READ];
+
+        $sql = "
+            INSERT INTO messageReceive (messageId, toUser, `read`)
+                SELECT ?, userId, 0
+                    FROM `user`
+                    WHERE userId != ?
+        ";
+
+        DB::statement($sql, [$messageId, $fromUserId]);
+
+        if (!$this->getAffectedRows())
+        {
+            throw new BadRequestHttpException('Nobody can receive this message.');
+        }
+    }
+
+    /**
+     * Send a message to all members of the given groups.
+     *
+     * @param int $messageId
+     * @param array $groupNames
+     *
+     * @throws BadRequestHttpException
+     */
+    protected function deliverGroupMessage($messageId, array $groupNames) {
+        $groupPlaceholders = implode(',', array_pad(array(), count($groupNames), '?'));
+        $values = array_merge([$messageId], $groupNames);
+
+        $sql = "
+            INSERT INTO messageReceive (messageId, toUser, `read`)
+                SELECT ?, userId, 0
+                    FROM (SELECT m.userId
+                               FROM `group` g
+                               JOIN `groupMember` m ON g.groupId = m.groupId
+                               WHERE g.groupName IN ($groupPlaceholders)) AS userIds;
+        ";
+
+        DB::statement($sql, $values);
+
+        if (!$this->getAffectedRows())
+        {
+            throw new BadRequestHttpException('Nobody can receive this message.');
+        }
+    }
+
+    /**
+     * Send a message to all given users.
+     *
+     * @param int $messageId
+     * @param array $usernames
+     *
+     * @throws BadRequestHttpException
+     */
+    protected function deliverUserMessage($messageId, array $usernames) {
+        $userPlaceholders = implode(',', array_pad(array(), count($usernames), '?'));
+        $values = array_merge([$messageId], $usernames);
+
+        $sql = "
+            INSERT INTO messageReceive (messageId, toUser, `read`)
+                SELECT ?, userId, 0
+                    FROM (SELECT userId
+                               FROM `user`
+                               WHERE username IN ($userPlaceholders)) AS userIds;
+        ";
+
+        DB::statement($sql, $values);
+
+        if (!$this->getAffectedRows())
+        {
+            throw new BadRequestHttpException('Nobody can receive this message.');
+        }
     }
 
     /**

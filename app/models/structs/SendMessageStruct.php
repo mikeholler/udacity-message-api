@@ -15,14 +15,14 @@ class SendMessageStruct extends BaseStruct {
     public $broadcast;
 
     /**
-     * Users to send message to.
+     * Users to send message to (usernames).
      *
      * @var array
      */
     public $toUsers;
 
     /**
-     * Groups to send message to.
+     * Groups to send message to (groupNames).
      *
      * @var array
      */
@@ -43,9 +43,25 @@ class SendMessageStruct extends BaseStruct {
     public $body;
 
     /**
+     * Populate object variables with items from a dictionary.
+     *
+     * @param array $data Associative
+     */
+    public function hydrate(array $data) {
+        foreach ($data as $k => $v) {
+            $this->{$k} = $v;
+        }
+    }
+
+    /**
      * @throws BadRequestHttpException
      */
     public function validate() {
+        if (((bool)$this->broadcast)
+                + ((bool) $this->toGroups)
+                + ((bool) $this->toUsers) !== 1)
+            throw new BadRequestHttpException('Only specify one of: broadcast, toGroups, toUsers');
+
         // No recipient means invalid request.
         if (!($this->broadcast or $this->toUsers or $this->toGroups))
             throw new BadRequestHttpException('Must provide at least one recipient');

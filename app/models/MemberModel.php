@@ -1,11 +1,16 @@
 <?php
 
+use Illuminate\Database\Query\Builder;
+
 class MemberModel extends BaseModel {
 
     const TABLE = 'groupMember';
     const GROUP_ID = 'groupId';
     const USER_ID = 'userId';
 
+    /**
+     * @var Builder
+     */
     protected $table;
 
     public function __construct() {
@@ -16,11 +21,35 @@ class MemberModel extends BaseModel {
      * Get all users in a particular group.
      *
      * @param int $groupId
+     *
+     * @return array
      */
     public function getAll($groupId) {
         return $this->table
             ->where(self::GROUP_ID, $groupId)
             ->get([self::USER_ID]);
+    }
+
+    /**
+     * Get all users in the given groups.
+     *
+     * @param int|array $groupNames
+     *
+     * @return array 1D array of all userIds in given groups.
+     */
+    public function getUserIdsByGroupNames($groupNames) {
+        $groupNames = is_int($groupNames) ? [$groupNames] : $groupNames;
+
+        return $this->table
+            ->join(
+                GroupModel::TABLE,
+                self::qualify([self::TABLE, self::GROUP_ID]),
+                '=',
+                self::qualify([GroupModel::TABLE, GroupModel::GROUP_ID]))
+            ->whereIn(
+                self::qualify([GroupModel::TABLE, GroupModel::GROUP_NAME]),
+                $groupNames)
+            ->lists(self::qualify([self::TABLE, self::USER_ID]));
     }
 
     /**
@@ -30,7 +59,7 @@ class MemberModel extends BaseModel {
      * @param int $userId
      */
     public function add($groupId, $userId) {
-        return $this->table->insert(
+        $this->table->insert(
             [self::GROUP_ID, self::USER_ID]
         );
     }
@@ -40,6 +69,8 @@ class MemberModel extends BaseModel {
      *
      * @param $groupId
      * @param $userId
+     *
+     * @return int
      */
     public function remove($groupId, $userId) {
         return $this->table

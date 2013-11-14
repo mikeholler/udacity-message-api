@@ -4,10 +4,19 @@ use \Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class UserController extends \BaseController {
 
+    /**
+     * @var UserModel
+     */
     protected $userModel;
+
+    /**
+     * @var MessageModel
+     */
+    protected $messageModel;
 
     public function __construct() {
         $this->userModel = new UserModel;
+        $this->messageModel = new MessageModel;
     }
 
 	/**
@@ -64,5 +73,18 @@ class UserController extends \BaseController {
 	{
         $this->userModel->delete($userId);
 	}
+
+    /**
+     * Send a message as a particular user.
+     *
+     * @param int $userId
+     */
+    public function sendMessage($userId) {
+        $message = new SendMessageStruct;
+        $message->hydrate(Input::all());
+        $message->validate();
+
+        $this->messageModel->sendMessage($userId, $message);
+    }
 
 }

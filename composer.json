@@ -15,6 +15,7 @@
             "app/models/structs",
 			"app/database/migrations",
 			"app/database/seeds",
+            "app/facades",
             "app/bindings",
 			"app/tests/TestCase.php"
 		]
