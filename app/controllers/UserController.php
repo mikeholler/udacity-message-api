@@ -14,9 +14,9 @@ class UserController extends \BaseController {
      */
     protected $messageModel;
 
-    public function __construct() {
-        $this->userModel = new UserModel;
-        $this->messageModel = new MessageModel;
+    public function __construct(UserModel $userModel, MessageModel $messageModel) {
+        $this->userModel = $userModel;
+        $this->messageModel = $messageModel;
     }
 
 	/**

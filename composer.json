@@ -17,7 +17,8 @@
 			"app/database/seeds",
             "app/facades",
             "app/bindings",
-			"app/tests/TestCase.php"
+			"app/tests/TestCase.php",
+            "app/tests/ModelTestCase.php"
 		]
 	},
 	"scripts": {

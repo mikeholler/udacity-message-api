@@ -7,9 +7,9 @@ class GroupController extends \BaseController
 
     protected $groupModel;
 
-    public function __construct()
+    public function __construct(GroupModel $groupModel)
     {
-        $this->groupModel = new GroupModel;
+        $this->groupModel = $groupModel;
     }
 
     /**

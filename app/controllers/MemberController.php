@@ -4,8 +4,8 @@ class MemberController extends \BaseController {
 
     protected $memberModel;
 
-    public function __construct() {
-        $this->memberModel = new MemberModel;
+    public function __construct(MemberModel $memberModel) {
+        $this->memberModel = $memberModel;
     }
 
 	/**

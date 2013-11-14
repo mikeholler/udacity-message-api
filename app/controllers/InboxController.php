@@ -4,8 +4,8 @@ class InboxController extends \BaseController {
 
     protected $inboxModel;
 
-    public function __construct() {
-        $this->inboxModel = new MessageModel;
+    public function __construct(MessageModel $messageModel) {
+        $this->inboxModel = $messageModel;
     }
 
 	/**

@@ -50,29 +50,6 @@ class UserModel extends BaseModel {
             ]);
     }
 
-    /**
-     * Bulk convert usernames to userIds.
-     *
-     * @param int|array $usernames
-     *
-     * @return array 1D array of userIds.
-     */
-    public function getUserIdsByUsername($usernames) {
-        $usernames = is_int($usernames) ? [$usernames] : $usernames;
-
-        return $this->table
-            ->whereIn(self::USERNAME, $usernames)->lists(self::USER_ID);
-    }
-
-    /**
-     * Get all userIds.
-     *
-     * @return array list of userIds
-     */
-    public function getUserIds() {
-        return $this->table->lists(self::USER_ID);
-    }
-
     public function getOne($userId) {
         $user = $this->table->where(self::USER_ID, $userId)->first();
 
