@@ -21,13 +21,20 @@ class MemberModel extends BaseModel {
      * Get all users in a particular group.
      *
      * @param int $groupId
-     *
+     * @param null|int $limit
+     * @param null|int $offset
      * @return array
      */
-    public function getAll($groupId) {
-        return $this->table
-            ->where(self::GROUP_ID, $groupId)
-            ->get([self::USER_ID]);
+    public function getAll($groupId, $limit=null, $offset=null) {
+        $query = $this->table->where(self::GROUP_ID, $groupId);
+
+        // Allow for pagination.
+        if ($limit) {
+            $query = $query->limit($limit);
+            if ($offset) $query = $query->offset($offset);
+        }
+
+        return $query->lists(self::USER_ID);
     }
 
     /**

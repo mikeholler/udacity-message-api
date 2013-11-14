@@ -19,7 +19,13 @@ class GroupController extends \BaseController
      */
     public function index()
     {
-        return Response::json($this->groupModel->getAll());
+        $limit = Input::get('limit');
+        $offset = Input::get('offset');
+
+        $limit = is_numeric($limit) or is_null($limit) ? intval($limit) : null;
+        $offset = is_numeric($offset) or is_null($offset) ? intval($offset) : null;
+
+        return Response::json($this->groupModel->getAll($limit, $offset));
     }
 
     /**

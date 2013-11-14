@@ -18,8 +18,16 @@ class UserModel extends BaseModel {
         $this->table = DB::table(self::TABLE);
     }
 
-    public function getAll() {
-        return $this->table->get();
+    public function getAll($limit=null, $offset=null) {
+        $query = $this->table;
+
+        // Allow for pagination.
+        if ($limit) {
+            $query = $query->limit($limit);
+            if ($offset) $query = $query->offset($offset);
+        }
+
+        return $query->get();
     }
 
     /**

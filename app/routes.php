@@ -21,4 +21,4 @@ Route::get('users/{users}/groups', 'UserController@showGroups');
 Route::post('users/{users}/send', 'UserController@sendMessage');
 Route::resource('users.inbox', 'InboxController', ['only' => ['index', 'show', 'destroy']]);
 Route::resource('groups', 'GroupController', ['only' => ['index', 'show', 'store', 'destroy']]);
-Route::resource('groups.member', 'MemberController', ['only' => ['index', 'update', 'destroy']]);
+Route::resource('groups.members', 'MemberController', ['only' => ['index', 'update', 'destroy']]);
