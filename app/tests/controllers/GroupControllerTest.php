@@ -5,20 +5,14 @@ use \Mockery as m;
 class GroupControllerTest extends TestCase {
 
     /**
-     * @var GroupController
-     */
-    protected $controller;
-
-    /**
-     * @var GroupModel
+     * @var m\Mock
      */
     protected $groupModel;
 
     public function setUp() {
         parent::setUp();
 
-        $this->groupModel = m::mock('GroupModel');
-        $this->controller = new GroupController($this->groupModel);
+        $this->groupModel = $this->mock('GroupModel');
     }
 
     public function tearDown() {
@@ -27,43 +21,51 @@ class GroupControllerTest extends TestCase {
     }
 
     public function testIndex() {
+        $data = ['data'];
         $this->groupModel->shouldReceive('getAll')->once()
-            ->andReturn(['notEmpty']);
+            ->with(1, 2)->andReturn($data);
 
-        $response = $this->controller->index();
+        $response = $this->call('GET', 'groups', ['limit' => '1', 'offset' => '2']);
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('["notEmpty"]', $response->getContent());
+        $this->assertResponseOk();
+        $this->assertEquals(json_encode($data), $response->getContent());
     }
 
-//    public function testStore() {
-//
-//    }
-//
-//    /**
-//     * @expectedException \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
-//     */
-//    public function testStoreBadRequest() {
-//
-//    }
+    public function testStore() {
+        $data = ['groupName' => 'testgroup'];
+        $this->groupModel->shouldReceive('create')->once()
+            ->with('testgroup');
+
+        $this->call('POST', 'groups', [], [], ['CONTENT_TYPE' => 'application/json'], json_encode($data));
+
+        $this->assertResponseOk();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+     */
+    public function testStoreBadRequest() {
+        $this->call('POST', 'groups');
+    }
 
     public function testShow() {
+        $data = ['key' => 'value'];
         $this->groupModel->shouldReceive('getOne')->once()
-            ->with(1)->andReturn(['notEmpty']);
+            ->with(1)->andReturn($data);
 
-        $response = $this->controller->show(1);
+        $response = $this->call('GET', 'groups/1');
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('["notEmpty"]', $response->getContent());
+        $this->assertResponseOk();
+        $this->assertEquals(json_encode($data), $response->getContent());
     }
 
     public function testDestroy() {
         $this->groupModel->shouldReceive('delete')->once()
-            ->with(1)->andReturn(null);
+            ->with(1);
 
-        $response = $this->controller->destroy(1);
+        $this->call('DELETE', 'groups/1');
 
-        $this->assertNull($response);
+        $this->assertResponseOk();
     }
 
 }

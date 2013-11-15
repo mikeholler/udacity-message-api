@@ -5,48 +5,41 @@ use \Mockery as m;
 class MemberControllerTest extends TestCase {
 
     /**
-     * @var MemberController
-     */
-    protected $controller;
-
-    /**
-     * @var MemberModel
+     * @var m\Mock
      */
     protected $memberModel;
 
     public function setUp() {
         parent::setUp();
 
-        $this->memberModel = m::mock('MemberModel');
-        $this->controller = new MemberController($this->memberModel);
+        $this->memberModel = $this->mock('MemberModel');
     }
 
     public function testIndex() {
+        $data = ['data'];
         $this->memberModel->shouldReceive('getAll')->once()
-            ->andReturn(['notEmpty']);
+            ->andReturn($data);
 
-        $response = $this->controller->index(1);
+        $response = $this->call('GET', 'groups/1/members');
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('["notEmpty"]', $response->getContent());
+        $this->assertResponseOk();
+        $this->assertEquals(json_encode($data), $response->getContent());
     }
 
     public function testUpdate() {
         $this->memberModel->shouldReceive('add')->once()
             ->with(1, 2)->andReturn(null);
 
-        $response = $this->controller->update(2, 1);
+        $this->call('PUT', 'groups/2/members/1');
 
-        $this->assertNull($response);
+        $this->assertResponseOk();
     }
 
     public function testDestroy() {
         $this->memberModel->shouldReceive('delete')->once()
-            ->with(1, 2)->andReturn(null);
+            ->with(1, 2);
 
-        $response = $this->controller->destroy(2, 1);
-
-        $this->assertNull($response);
+        $this->call('DELETE', 'groups/2/members/1');
     }
 
 }

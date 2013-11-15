@@ -5,52 +5,49 @@ use \Mockery as m;
 class InboxControllerTest extends TestCase {
 
     /**
-     * @var InboxController
-     */
-    protected $controller;
-
-    /**
-     * @var MessageModel
+     * @var m\Mock
      */
     protected $messageModel;
 
     public function setUp() {
         parent::setUp();
 
-        $this->messageModel = m::mock('MessageModel');
-        $this->controller = new InboxController($this->messageModel);
+        $this->messageModel = $this->mock('MessageModel');
     }
 
     public function tearDown() {
         m::close();
+        parent::tearDown();
     }
 
     public function testIndex() {
+        $data = ['data'];
         $this->messageModel->shouldReceive('getInbox')->once()
-            ->andReturn(['notEmpty']);
+            ->andReturn($data);
 
-        $response = $this->controller->index(1);
+        $response = $this->call('GET', 'users/1/inbox');
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('["notEmpty"]', $response->getContent());
+        $this->assertResponseOk();
+        $this->assertEquals(json_encode($data), $response->getContent());
     }
 
     public function testShow() {
+        $data = ['key' => 'value'];
         $this->messageModel->shouldReceive('getMessage')->once()
-            ->with(1, 2)->andReturn(['notEmpty']);
+            ->with(1, 2)->andReturn($data);
 
-        $response = $this->controller->show(1, 2);
+        $response = $this->call('GET', 'users/1/inbox/2');
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('["notEmpty"]', $response->getContent());
+        $this->assertResponseOk();
+        $this->assertEquals(json_encode($data), $response->getContent());
     }
 
     public function testDelete() {
         $this->messageModel->shouldReceive('deleteMessage')->once()
             ->with(1, 2)->andReturn(null);
 
-        $response = $this->controller->destroy(1, 2);
+        $this->call('DELETE', 'users/1/inbox/2');
 
-        $this->assertNull($response);
+        $this->assertResponseOk();
     }
 }
