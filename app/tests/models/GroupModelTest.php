@@ -13,6 +13,40 @@ class GroupModelTest extends ModelTestCase {
         $this->model = new GroupModel;
     }
 
+    public function testGetAll() {
+        DB::table('group')->insert(['groupId' => 1, 'groupName' => 'foo']);
+        DB::table('group')->insert(['groupId' => 2, 'groupName' => 'bar']);
+
+        // Test get all
+        $groups = $this->model->getAll();
+
+        $this->assertEquals(2, count($groups));
+        $this->assertEquals('foo', $groups[0]->groupName);
+        $this->assertEquals('bar', $groups[1]->groupName);
+    }
+
+    public function testGetAllLimit() {
+        DB::table('group')->insert(['groupId' => 1, 'groupName' => 'foo']);
+        DB::table('group')->insert(['groupId' => 2, 'groupName' => 'bar']);
+
+        // Test get all
+        $groups = $this->model->getAll(1);
+
+        $this->assertEquals(1, count($groups));
+        $this->assertEquals('foo', $groups[0]->groupName);
+    }
+
+    public function testGetAllLimitOffset() {
+        DB::table('group')->insert(['groupId' => 1, 'groupName' => 'foo']);
+        DB::table('group')->insert(['groupId' => 2, 'groupName' => 'bar']);
+
+        // Test get all
+        $groups = $this->model->getAll(1, 1);
+
+        $this->assertEquals(1, count($groups));
+        $this->assertEquals('bar', $groups[0]->groupName);
+    }
+
     public function testCreateGroup() {
         $this->model->create('foo');
 
