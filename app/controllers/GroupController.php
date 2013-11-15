@@ -15,7 +15,7 @@ class GroupController extends \BaseController
     /**
      * Display a listing of the resource.
      *
-     * @return Response
+     * @return \Illuminate\Http\Response
      */
     public function index()
     {
@@ -31,7 +31,6 @@ class GroupController extends \BaseController
     /**
      * Store a newly created resource in storage.
      *
-     * @return Response
      * @throws BadRequestHttpException
      */
     public function store()
@@ -48,7 +47,7 @@ class GroupController extends \BaseController
      * Display the specified resource.
      *
      * @param  int $id
-     * @return Response
+     * @return \Illuminate\Http\Response
      */
     public function show($id)
     {
@@ -59,7 +58,6 @@ class GroupController extends \BaseController
      * Remove the specified resource from storage.
      *
      * @param  int $id
-     * @return Response
      */
     public function destroy($id)
     {

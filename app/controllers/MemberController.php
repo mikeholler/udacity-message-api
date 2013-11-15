@@ -13,7 +13,7 @@ class MemberController extends \BaseController {
      *
      * @param int $groupId
 	 *
-	 * @return Response
+	 * @return \Illuminate\Http\Response
 	 */
 	public function index($groupId)
 	{
@@ -31,8 +31,6 @@ class MemberController extends \BaseController {
 	 *
 	 * @param int $groupId
      * @param int $memberId
-     *
-	 * @return Response
 	 */
 	public function update($groupId, $memberId)
 	{
@@ -44,8 +42,6 @@ class MemberController extends \BaseController {
 	 *
 	 * @param  int  $groupId
      * @param int $memberId
-     *
-	 * @return Response
 	 */
 	public function destroy($groupId, $memberId)
 	{

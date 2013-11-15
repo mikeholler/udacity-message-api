@@ -22,7 +22,7 @@ class UserController extends \BaseController {
 	/**
 	 * Display a listing of the resource.
 	 *
-	 * @return Response
+	 * @return \Illuminate\Http\Response
 	 */
 	public function index()
 	{
@@ -38,7 +38,6 @@ class UserController extends \BaseController {
 	/**
 	 * Store a newly created resource in storage.
 	 *
-	 * @return Response
      * @throws BadRequestHttpException
 	 */
 	public function store()
@@ -56,13 +55,19 @@ class UserController extends \BaseController {
 	 *
      * @param int $userId
      *
-	 * @return Response
+	 * @return \Illuminate\Http\Response
 	 */
 	public function show($userId)
 	{
         return Response::json($this->userModel->getOne($userId));
 	}
 
+    /**
+     * Show the groups a given user is a member of.
+     *
+     * @param int $userId
+     * @return \Illuminate\Http\Response
+     */
     public function showGroups($userId)
     {
         return Response::json($this->userModel->getGroups($userId));
@@ -72,8 +77,6 @@ class UserController extends \BaseController {
 	 * Remove the specified resource from storage.
 	 *
 	 * @param int $userId
-     *
-	 * @return Response
 	 */
 	public function destroy($userId)
 	{

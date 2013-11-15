@@ -2,10 +2,10 @@
 
 class InboxController extends \BaseController {
 
-    protected $inboxModel;
+    protected $messageModel;
 
     public function __construct(MessageModel $messageModel) {
-        $this->inboxModel = $messageModel;
+        $this->messageModel = $messageModel;
     }
 
 	/**
@@ -13,7 +13,7 @@ class InboxController extends \BaseController {
 	 *
      * @param int $userId
      *
-	 * @return Response
+	 * @return \Illuminate\Http\Response
 	 */
 	public function index($userId)
 	{
@@ -23,7 +23,7 @@ class InboxController extends \BaseController {
         $limit = is_numeric($limit) or is_null($limit) ? intval($limit) : null;
         $offset = is_numeric($offset) or is_null($offset) ? intval($offset) : null;
 
-        return Response::json($this->inboxModel->getInbox($userId, $limit, $offset));
+        return Response::json($this->messageModel->getInbox($userId, $limit, $offset));
 	}
 
 	/**
@@ -31,11 +31,12 @@ class InboxController extends \BaseController {
 	 *
 	 * @param  int  $userId
      * @param  int  $messageId
-	 * @return Response
+     *
+	 * @return \Illuminate\Http\Response
 	 */
 	public function show($userId, $messageId)
 	{
-        return Response::json($this->inboxModel->getMessage($userId, $messageId));
+        return Response::json($this->messageModel->getMessage($userId, $messageId));
 	}
 
 	/**
@@ -43,12 +44,10 @@ class InboxController extends \BaseController {
 	 *
 	 * @param  int  $userId
      * @param  int  $messageId
-     *
-	 * @return Response
 	 */
 	public function destroy($userId, $messageId)
 	{
-        $this->inboxModel->deleteMessage($userId, $messageId);
+        $this->messageModel->deleteMessage($userId, $messageId);
 	}
 
 }
