@@ -155,31 +155,34 @@ class MessageModel extends BaseModel {
     /**
      * Send a message as the given user.
      *
-     * @param int $userId
+     * @param int $senderId
      * @param SendMessageStruct $message
+     *
+     * @return int Message id.
      */
-    public function sendMessage($userId, SendMessageStruct $message) {
-        DB::transaction(function () use ($userId, $message) {
+    public function sendMessage($senderId, SendMessageStruct $message) {
+        return DB::transaction(function () use ($senderId, $message) {
 
             // Create the outbox entry and message body. There is only
             // one of each for each message.
-            $messageId = $this->createSenderMessage($userId, $message);
+            $messageId = $this->createSenderMessage($senderId, $message);
             $this->createMessageBody($messageId, $message->body);
 
 
             if ($message->broadcast)
             {
-                $this->deliverBroadcastMessage($messageId, $userId);
+                $this->deliverBroadcastMessage($messageId, $senderId);
             }
             else if ($message->toGroups)
             {
-                $this->deliverGroupMessage($messageId, $message->toGroups);
-//                $this->deliverMessage($messageId, $message->toUsers, $message->toGroups);
+                $this->deliverGroupMessage($senderId, $messageId, $message->toGroups);
             }
             else
             {
-                $this->deliverUserMessage($messageId, $message->toUsers);
+                $this->deliverUserMessage($senderId, $messageId, $message->toUsers);
             }
+
+            return $messageId;
         });
     }
 
@@ -229,11 +232,10 @@ class MessageModel extends BaseModel {
      * @throws BadRequestHttpException
      */
     protected function deliverBroadcastMessage($messageId, $fromUserId) {
-        $columns = [self::ATTR_MESSAGE_ID, self::ATTR_TO_USER, self::ATTR_READ];
 
         $sql = "
             INSERT INTO messageReceive (messageId, toUser, `read`)
-                SELECT ?, userId, 0
+                SELECT DISTINCT ?, userId, 0
                     FROM `user`
                     WHERE userId != ?
         ";
@@ -242,6 +244,7 @@ class MessageModel extends BaseModel {
 
         if (!$this->getAffectedRows())
         {
+            // Will occur if sender is the only user in the database.
             throw new BadRequestHttpException('Nobody can receive this message.');
         }
     }
@@ -249,28 +252,40 @@ class MessageModel extends BaseModel {
     /**
      * Send a message to all members of the given groups.
      *
+     * @param int $senderId
      * @param int $messageId
      * @param array $groupNames
      *
      * @throws BadRequestHttpException
      */
-    protected function deliverGroupMessage($messageId, array $groupNames) {
+    protected function deliverGroupMessage($senderId, $messageId, array $groupNames) {
         $groupPlaceholders = implode(',', array_pad(array(), count($groupNames), '?'));
         $values = array_merge([$messageId], $groupNames);
 
         $sql = "
             INSERT INTO messageReceive (messageId, toUser, `read`)
-                SELECT ?, userId, 0
+                SELECT DISTINCT ?, userId, 0
                     FROM (SELECT m.userId
                                FROM `group` g
                                JOIN `groupMember` m ON g.groupId = m.groupId
-                               WHERE g.groupName IN ($groupPlaceholders)) AS userIds;
+                               WHERE g.groupName IN ($groupPlaceholders)) AS userIds
+                    WHERE userId != $senderId;
         ";
 
-        DB::statement($sql, $values);
+        try
+        {
+            DB::statement($sql, $values);
+        }
+        catch (Exception $e)
+        {
+            // Exception will occur if sender is the only member
+            // in any of the groups.
+            throw new BadRequestHttpException('Nobody can receive this message.');
+        }
 
         if (!$this->getAffectedRows())
         {
+            // Will occur if no groupNames resolve to a group.
             throw new BadRequestHttpException('Nobody can receive this message.');
         }
     }
@@ -278,27 +293,39 @@ class MessageModel extends BaseModel {
     /**
      * Send a message to all given users.
      *
+     * @param int $senderId
      * @param int $messageId
      * @param array $usernames
      *
      * @throws BadRequestHttpException
      */
-    protected function deliverUserMessage($messageId, array $usernames) {
+    protected function deliverUserMessage($senderId, $messageId, array $usernames) {
         $userPlaceholders = implode(',', array_pad(array(), count($usernames), '?'));
         $values = array_merge([$messageId], $usernames);
 
         $sql = "
             INSERT INTO messageReceive (messageId, toUser, `read`)
-                SELECT ?, userId, 0
+                SELECT DISTINCT ?, userId, 0
                     FROM (SELECT userId
                                FROM `user`
-                               WHERE username IN ($userPlaceholders)) AS userIds;
+                               WHERE username IN ($userPlaceholders)
+                                   AND userId != $senderId) AS userIds;
         ";
 
-        DB::statement($sql, $values);
+        try
+        {
+            DB::statement($sql, $values);
+        }
+        catch (Exception $e)
+        {
+            // Exception will occur if sender is the only real
+            // user provided.
+            throw new BadRequestHttpException('Nobody can receive this message.');
+        }
 
         if (!$this->getAffectedRows())
         {
+            // Will occur if none of the usernames are real.
             throw new BadRequestHttpException('Nobody can receive this message.');
         }
     }
@@ -311,7 +338,7 @@ class MessageModel extends BaseModel {
      *
      * @throws NotFoundHttpException
      */
-    protected function markRead($userId, $messageId) {
+    public function markRead($userId, $messageId) {
         $this->tableMessageReceive
             ->where(self::ATTR_TO_USER, $userId)
             ->where(self::ATTR_MESSAGE_ID, $messageId)

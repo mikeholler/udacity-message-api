@@ -12,16 +12,28 @@ class MemberTableSeeder extends Seeder {
     {
         DB::table(M::TABLE)->insert([
             [
-                M::GROUP_ID => 1,
-                M::USER_ID => 1
+                M::USER_ID => 1,
+                M::GROUP_ID => 1
             ],
             [
-                M::GROUP_ID => 2,
                 M::USER_ID => 2,
+                M::GROUP_ID => 1
             ],
             [
-                M::GROUP_ID => 2,
-                M::USER_ID => 3
+                M::USER_ID => 3,
+                M::GROUP_ID => 2
+            ],
+            [
+                M::USER_ID => 1,
+                M::GROUP_ID => 3
+            ],
+            [
+                M::USER_ID => 2,
+                M::GROUP_ID => 3
+            ],
+            [
+                M::USER_ID => 3,
+                M::GROUP_ID => 3
             ]
         ]);
     }
