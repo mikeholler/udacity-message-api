@@ -180,4 +180,15 @@ class MessageModelTest extends ModelTestCase {
         $this->model->sendMessage(1, $message);
     }
 
+    public function testMarkRead() {
+        $this->model->markRead(2, 1);
+
+        $results = DB::table('messageReceive')
+            ->where('messageId', 1)
+            ->where('toUser', 2)
+            ->first();
+
+        $this->assertTrue((boolean) $results->read);
+    }
+
 }

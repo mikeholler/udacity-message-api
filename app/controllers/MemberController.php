@@ -1,15 +1,26 @@
 <?php
 
-class MemberController extends \BaseController {
+/**
+ * Provides methods to modify groups on a user membership level.
+ *
+ * Get information about users in groups and modify who is in a group.
+ */
+class MemberController extends \Controller {
 
+    /**
+     * @var MemberModel
+     */
     protected $memberModel;
 
-    public function __construct(MemberModel $memberModel) {
+    public function __construct(MemberModel $memberModel)
+    {
         $this->memberModel = $memberModel;
     }
 
 	/**
-	 * List all members in a given group.
+	 * List all members in group.
+     *
+     * Supports limit and offset url parameters for pagination.
      *
      * @param int $groupId
 	 *
@@ -27,7 +38,7 @@ class MemberController extends \BaseController {
 	}
 
 	/**
-	 * Add user to a given group.
+	 * Add user to given group.
 	 *
 	 * @param int $groupId
      * @param int $memberId
@@ -38,9 +49,9 @@ class MemberController extends \BaseController {
 	}
 
 	/**
-	 * Remove user from given group.
+	 * Remove user from group.
 	 *
-	 * @param  int  $groupId
+	 * @param int $groupId
      * @param int $memberId
 	 */
 	public function destroy($groupId, $memberId)

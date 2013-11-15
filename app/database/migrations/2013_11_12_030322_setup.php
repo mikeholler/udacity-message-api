@@ -12,7 +12,8 @@ class Setup extends Migration {
 	 */
 	public function up()
 	{
-        Schema::create('user', function(Blueprint $table) {
+        Schema::create('user', function(Blueprint $table)
+        {
             $table->increments('userId');
             $table->string('username')->unique();
             $table->dateTime('created');
@@ -20,7 +21,8 @@ class Setup extends Migration {
             $table->engine = 'InnoDB';
         });
 
-        Schema::create('group', function(Blueprint $table) {
+        Schema::create('group', function(Blueprint $table)
+        {
             $table->increments('groupId');
             $table->string('groupName')->unique();
             $table->dateTime('created');
@@ -28,7 +30,8 @@ class Setup extends Migration {
             $table->engine = 'InnoDB';
         });
 
-        Schema::create('groupMember', function(Blueprint $table) {
+        Schema::create('groupMember', function(Blueprint $table)
+        {
             $table->unsignedInteger('groupId');
             $table->unsignedInteger('userId');
 
@@ -45,7 +48,8 @@ class Setup extends Migration {
             $table->engine = 'InnoDB';
         });
 
-        Schema::create('messageSend', function(Blueprint $table) {
+        Schema::create('messageSend', function(Blueprint $table)
+        {
             $table->increments('messageId');
             $table->unsignedInteger('fromUser');
             $table->string('subject');
@@ -58,7 +62,8 @@ class Setup extends Migration {
             $table->engine = 'InnoDB';
         });
 
-        Schema::create('messageBody', function(Blueprint $table) {
+        Schema::create('messageBody', function(Blueprint $table)
+        {
             $table->increments('messageId');
             $table->mediumText('body');
 
@@ -69,7 +74,8 @@ class Setup extends Migration {
             $table->engine = 'InnoDB';
         });
 
-        Schema::create('messageReceive', function(Blueprint $table) {
+        Schema::create('messageReceive', function(Blueprint $table)
+        {
             $table->unsignedInteger('messageId');
             $table->unsignedInteger('toUser');
             $table->boolean('read');

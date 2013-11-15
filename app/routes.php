@@ -11,11 +11,6 @@
 |
 */
 
-Route::get('/', function()
-{
-	return View::make('hello');
-});
-
 Route::resource('users', 'UserController', ['only' => ['index', 'show', 'store', 'destroy']]);
 Route::get('users/{users}/groups', 'UserController@showGroups');
 Route::post('users/{users}/send', 'UserController@sendMessage');

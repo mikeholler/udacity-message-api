@@ -3,6 +3,7 @@
 use MessageModel as M;
 
 class MessageTablesSeeder extends Seeder {
+
     /**
      * Run the database seeds.
      *

@@ -1,15 +1,24 @@
 <?php
 
-class InboxController extends \BaseController {
+/**
+ * Handle messages received by a given user.
+ */
+class InboxController extends \Controller {
 
+    /**
+     * @var MessageModel
+     */
     protected $messageModel;
 
-    public function __construct(MessageModel $messageModel) {
+    public function __construct(MessageModel $messageModel)
+    {
         $this->messageModel = $messageModel;
     }
 
 	/**
-	 * Display a listing of the resource.
+	 * Get a list of messages in a given user's inbox.
+     *
+     * Supports limit and offset url parameters for pagination.
 	 *
      * @param int $userId
      *
@@ -27,10 +36,12 @@ class InboxController extends \BaseController {
 	}
 
 	/**
-	 * Display the specified resource.
+	 * Open a message in the user's inbox.
+     *
+     * Messages are automatically marked as read when opened.
 	 *
-	 * @param  int  $userId
-     * @param  int  $messageId
+	 * @param int $userId
+     * @param int $messageId
      *
 	 * @return \Illuminate\Http\Response
 	 */
@@ -40,10 +51,10 @@ class InboxController extends \BaseController {
 	}
 
 	/**
-	 * Remove the specified resource from storage.
+     * Delete message from user's inbox.
 	 *
-	 * @param  int  $userId
-     * @param  int  $messageId
+	 * @param int $userId
+     * @param int $messageId
 	 */
 	public function destroy($userId, $messageId)
 	{

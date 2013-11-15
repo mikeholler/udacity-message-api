@@ -3,6 +3,7 @@
 use MemberModel as M;
 
 class MemberTableSeeder extends Seeder {
+
     /**
      * Run the database seeds.
      *

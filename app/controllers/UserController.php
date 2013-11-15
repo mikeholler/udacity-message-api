@@ -2,7 +2,10 @@
 
 use \Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class UserController extends \BaseController {
+/**
+ * Audit and change information about users.
+ */
+class UserController extends \Controller {
 
     /**
      * @var UserModel
@@ -20,7 +23,9 @@ class UserController extends \BaseController {
     }
 
 	/**
-	 * Display a listing of the resource.
+	 * Get a list of all users.
+     *
+     * Supports limit and offset url parameters for pagination.
 	 *
 	 * @return \Illuminate\Http\Response
 	 */
@@ -36,7 +41,7 @@ class UserController extends \BaseController {
 	}
 
 	/**
-	 * Store a newly created resource in storage.
+	 * Create a new user.
 	 *
      * @throws BadRequestHttpException
 	 */
@@ -51,7 +56,7 @@ class UserController extends \BaseController {
 	}
 
 	/**
-	 * Display the specified resource.
+	 * Get information about a single user.
 	 *
      * @param int $userId
      *
@@ -63,7 +68,7 @@ class UserController extends \BaseController {
 	}
 
     /**
-     * Show the groups a given user is a member of.
+     * Show the groups user is member of.
      *
      * @param int $userId
      * @return \Illuminate\Http\Response
@@ -74,7 +79,7 @@ class UserController extends \BaseController {
     }
 
 	/**
-	 * Remove the specified resource from storage.
+	 * Delete a user.
 	 *
 	 * @param int $userId
 	 */

@@ -3,6 +3,9 @@
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
+/**
+ * Perform operations on users stored in the database.
+ */
 class UserModel extends BaseModel {
 
     const TABLE = 'user';
@@ -15,17 +18,31 @@ class UserModel extends BaseModel {
      */
     protected $table;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->table = DB::table(self::TABLE);
     }
 
-    public function getAll($limit=null, $offset=null) {
+    /**
+     * Get a list of all users.
+     *
+     * @param int|null $limit
+     * @param int|null $offset
+     * @return array Array of user objects.
+     */
+    public function getAll($limit=null, $offset=null)
+    {
         $query = $this->table;
 
         // Allow for pagination.
-        if ($limit) {
+        if ($limit)
+        {
             $query = $query->limit($limit);
-            if ($offset) $query = $query->offset($offset);
+
+            if ($offset)
+            {
+                $query = $query->offset($offset);
+            }
         }
 
         return $query->get();
@@ -36,7 +53,8 @@ class UserModel extends BaseModel {
      *
      * @param int $userId
      */
-    public function getGroups($userId) {
+    public function getGroups($userId)
+    {
         return DB::table(MemberModel::TABLE)
             ->join(
                 GroupModel::TABLE,
@@ -50,15 +68,38 @@ class UserModel extends BaseModel {
             ]);
     }
 
-    public function getOne($userId) {
+    /**
+     * Get an individual user.
+     *
+     * @param int $userId
+     *
+     * @return stdClass
+     *
+     * @throws Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public function getOne($userId)
+    {
         $user = $this->table->where(self::USER_ID, $userId)->first();
 
-        if (!$user) throw new NotFoundHttpException;
+        if (!$user)
+        {
+            throw new NotFoundHttpException;
+        }
 
         return $user;
     }
 
-    public function create($username) {
+    /**
+     * Create a user.
+     *
+     * @param string $username
+     *
+     * @return int userId
+     *
+     * @throws Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+     */
+    public function create($username)
+    {
 
         try
         {
@@ -73,8 +114,13 @@ class UserModel extends BaseModel {
         }
     }
 
-    public function delete($id) {
-        return $this->table->where(self::USER_ID, $id)->delete();
+    /**
+     * Delete a user.
+     *
+     * @param int $userId
+     */
+    public function delete($userId) {
+        $this->table->where(self::USER_ID, $userId)->delete();
     }
 
 }

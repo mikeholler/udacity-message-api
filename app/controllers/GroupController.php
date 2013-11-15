@@ -2,9 +2,17 @@
 
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class GroupController extends \BaseController
+/**
+ * A group is a collection of users. GroupController provides methods for
+ * CRUD operations on group meta data. There is no user data relayed by
+ * any of the methods in this controller.
+ */
+class GroupController extends \Controller
 {
 
+    /**
+     * @var GroupModel
+     */
     protected $groupModel;
 
     public function __construct(GroupModel $groupModel)
@@ -13,7 +21,9 @@ class GroupController extends \BaseController
     }
 
     /**
-     * Display a listing of the resource.
+     * Get a list of groups all groups.
+     *
+     * Supports limit and offset url parameters for pagination.
      *
      * @return \Illuminate\Http\Response
      */
@@ -29,35 +39,40 @@ class GroupController extends \BaseController
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Create a new group.
      *
      * @throws BadRequestHttpException
      */
     public function store()
     {
         if (Input::has('groupName'))
+        {
             $groupName = Input::get('groupName');
+        }
         else
+        {
             throw new BadRequestHttpException('groupName missing');
+        }
 
         $this->groupModel->create($groupName);
     }
 
     /**
-     * Display the specified resource.
+     * Get a single group.
      *
-     * @param  int $id
+     * @param int $groupId
+     *
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($groupId)
     {
-        return Response::json($this->groupModel->getOne($id));
+        return Response::json($this->groupModel->getOne($groupId));
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Delete a group.
      *
-     * @param  int $id
+     * @param int $id
      */
     public function destroy($id)
     {

@@ -1,8 +1,10 @@
 <?php
 
-use Illuminate\Database\Query\Builder;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
+/**
+ * Perform CRUD operations on the member database table.
+ */
 class MemberModel extends BaseModel {
 
     const TABLE = 'groupMember';
@@ -10,7 +12,7 @@ class MemberModel extends BaseModel {
     const USER_ID = 'userId';
 
     /**
-     * @var Builder
+     * @var \Illuminate\Database\Query\Builder
      */
     protected $table;
 
@@ -21,18 +23,25 @@ class MemberModel extends BaseModel {
     /**
      * Get all users in a particular group.
      *
-     * @param int $groupId
+     * @param int      $groupId
      * @param null|int $limit
      * @param null|int $offset
-     * @return array
+     *
+     * @return array List user objects.
      */
-    public function getAll($groupId, $limit=null, $offset=null) {
+    public function getAll($groupId, $limit=null, $offset=null)
+    {
         $query = $this->table->where(self::GROUP_ID, $groupId);
 
         // Allow for pagination.
-        if ($limit) {
+        if ($limit)
+        {
             $query = $query->limit($limit);
-            if ($offset) $query = $query->offset($offset);
+
+            if ($offset)
+            {
+                $query = $query->offset($offset);
+            }
         }
 
         return $query->lists(self::USER_ID);
@@ -46,7 +55,8 @@ class MemberModel extends BaseModel {
      *
      * @throws AccessDeniedHttpException
      */
-    public function add($userId, $groupId) {
+    public function add($userId, $groupId)
+    {
         try
         {
             $this->table->insert(
@@ -67,7 +77,8 @@ class MemberModel extends BaseModel {
      *
      * @return int
      */
-    public function delete($userId, $groupId) {
+    public function delete($userId, $groupId)
+    {
         return $this->table
             ->where(self::USER_ID, $userId)
             ->where(self::GROUP_ID, $groupId)

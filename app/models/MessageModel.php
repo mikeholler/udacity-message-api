@@ -68,7 +68,8 @@ class MessageModel extends BaseModel {
      */
     protected $tableMessageReceive;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->tableMessageSend = DB::table(self::TABLE_MESSAGE_SEND);
         $this->tableMessageBody= DB::table(self::TABLE_MESSAGE_BODY);
         $this->tableMessageReceive = DB::table(self::TABLE_MESSAGE_RECEIVE);
@@ -83,7 +84,8 @@ class MessageModel extends BaseModel {
      *
      * @return array|static
      */
-    public function getInbox($userId, $limit=null, $offset=null) {
+    public function getInbox($userId, $limit=null, $offset=null)
+    {
         $query = $this->tableMessageSend
             ->join(
                 self::TABLE_MESSAGE_RECEIVE,
@@ -93,9 +95,14 @@ class MessageModel extends BaseModel {
             ->where(self::qualify([self::TABLE_MESSAGE_RECEIVE, self::ATTR_TO_USER]), $userId);
 
         // Allow for pagination.
-        if ($limit) {
+        if ($limit)
+        {
             $query = $query->limit($limit);
-            if ($offset) $query = $query->offset($offset);
+
+            if ($offset)
+            {
+                $query = $query->offset($offset);
+            }
         }
 
         return $query->get();
@@ -111,10 +118,13 @@ class MessageModel extends BaseModel {
      *
      * @throws NotFoundHttpException
      */
-    public function getMessage($userId, $messageId) {
+    public function getMessage($userId, $messageId)
+    {
 
         return DB::transaction(function() use ($userId, $messageId){
+
             $this->markRead($userId, $messageId);
+
             $messages = $this->tableMessageSend
                 ->join(
                     self::TABLE_MESSAGE_RECEIVE,
@@ -130,7 +140,10 @@ class MessageModel extends BaseModel {
                 ->where(self::qualify([self::TABLE_MESSAGE_RECEIVE, self::ATTR_TO_USER]), $userId)
                 ->first();
 
-            if (!$messages) throw new NotFoundHttpException;
+            if (!$messages)
+            {
+                throw new NotFoundHttpException;
+            }
 
             return $messages;
         });
@@ -145,7 +158,8 @@ class MessageModel extends BaseModel {
      * @param int $userId
      * @param int $messageId
      */
-    public function deleteMessage($userId, $messageId) {
+    public function deleteMessage($userId, $messageId)
+    {
         $this->tableMessageReceive
             ->where(self::ATTR_TO_USER, $userId)
             ->where(self::ATTR_MESSAGE_ID, $messageId)
@@ -155,13 +169,15 @@ class MessageModel extends BaseModel {
     /**
      * Send a message as the given user.
      *
-     * @param int $senderId
+     * @param int               $senderId
      * @param SendMessageStruct $message
      *
      * @return int Message id.
      */
-    public function sendMessage($senderId, SendMessageStruct $message) {
-        return DB::transaction(function () use ($senderId, $message) {
+    public function sendMessage($senderId, SendMessageStruct $message)
+    {
+        return DB::transaction(function () use ($senderId, $message)
+        {
 
             // Create the outbox entry and message body. There is only
             // one of each for each message.
@@ -189,12 +205,13 @@ class MessageModel extends BaseModel {
     /**
      * Create the "outbox" message entry for the sender.
      *
-     * @param int $userId
+     * @param int               $userId
      * @param SendMessageStruct $message
      *
      * @return int messageId
      */
-    protected function createSenderMessage($userId, SendMessageStruct $message) {
+    protected function createSenderMessage($userId, SendMessageStruct $message)
+    {
         return $this->tableMessageSend->insertGetId(
             [
                 self::ATTR_FROM_USER => $userId,
@@ -210,7 +227,8 @@ class MessageModel extends BaseModel {
      * @param int $messageId
      * @param string $body
      */
-    protected function createMessageBody($messageId, $body) {
+    protected function createMessageBody($messageId, $body)
+    {
         $this->tableMessageBody->insert(
             [
                 self::ATTR_MESSAGE_ID => $messageId,
@@ -219,7 +237,13 @@ class MessageModel extends BaseModel {
         );
     }
 
-    protected function getAffectedRows() {
+    /**
+     * Get number of affected rows from the last query.
+     *
+     * @return int
+     */
+    protected function getAffectedRows()
+    {
         return DB::select('SELECT ROW_COUNT() as count')[0]->count;
     }
 
@@ -231,7 +255,8 @@ class MessageModel extends BaseModel {
      *
      * @throws BadRequestHttpException
      */
-    protected function deliverBroadcastMessage($messageId, $fromUserId) {
+    protected function deliverBroadcastMessage($messageId, $fromUserId)
+    {
 
         $sql = "
             INSERT INTO messageReceive (messageId, toUser, `read`)
@@ -258,7 +283,8 @@ class MessageModel extends BaseModel {
      *
      * @throws BadRequestHttpException
      */
-    protected function deliverGroupMessage($senderId, $messageId, array $groupNames) {
+    protected function deliverGroupMessage($senderId, $messageId, array $groupNames)
+    {
         $groupPlaceholders = implode(',', array_pad(array(), count($groupNames), '?'));
         $values = array_merge([$messageId], $groupNames);
 
@@ -299,7 +325,8 @@ class MessageModel extends BaseModel {
      *
      * @throws BadRequestHttpException
      */
-    protected function deliverUserMessage($senderId, $messageId, array $usernames) {
+    protected function deliverUserMessage($senderId, $messageId, array $usernames)
+    {
         $userPlaceholders = implode(',', array_pad(array(), count($usernames), '?'));
         $values = array_merge([$messageId], $usernames);
 
@@ -335,14 +362,14 @@ class MessageModel extends BaseModel {
      *
      * @param int $userId
      * @param int $messageId
-     *
-     * @throws NotFoundHttpException
      */
-    public function markRead($userId, $messageId) {
+    public function markRead($userId, $messageId)
+    {
         $this->tableMessageReceive
             ->where(self::ATTR_TO_USER, $userId)
             ->where(self::ATTR_MESSAGE_ID, $messageId)
             ->update([self::ATTR_READ => true]);
+
     }
 
 }

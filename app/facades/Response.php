@@ -5,6 +5,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Response as BaseResponse;
 
 class Response extends BaseResponse{
+
     /**
      * Return a new JSON response from the application.
      *
