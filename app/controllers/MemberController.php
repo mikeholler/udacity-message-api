@@ -36,7 +36,7 @@ class MemberController extends \BaseController {
 	 */
 	public function update($groupId, $memberId)
 	{
-        $this->memberModel->add($groupId, $memberId);
+        $this->memberModel->add($memberId, $groupId);
 	}
 
 	/**
@@ -49,7 +49,7 @@ class MemberController extends \BaseController {
 	 */
 	public function destroy($groupId, $memberId)
 	{
-        $this->memberModel->remove($groupId, $memberId);
+        $this->memberModel->delete($memberId, $groupId);
 	}
 
 }

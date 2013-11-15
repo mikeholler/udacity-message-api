@@ -39,40 +39,18 @@ class MemberModel extends BaseModel {
     }
 
     /**
-     * Get all users in the given groups.
-     *
-     * @param int|array $groupNames
-     *
-     * @return array 1D array of all userIds in given groups.
-     */
-    public function getUserIdsByGroupNames($groupNames) {
-        $groupNames = is_int($groupNames) ? [$groupNames] : $groupNames;
-
-        return $this->table
-            ->join(
-                GroupModel::TABLE,
-                self::qualify([self::TABLE, self::GROUP_ID]),
-                '=',
-                self::qualify([GroupModel::TABLE, GroupModel::GROUP_ID]))
-            ->whereIn(
-                self::qualify([GroupModel::TABLE, GroupModel::GROUP_NAME]),
-                $groupNames)
-            ->lists(self::qualify([self::TABLE, self::USER_ID]));
-    }
-
-    /**
      * Add a user to a particular group.
      *
-     * @param int $groupId
      * @param int $userId
+     * @param int $groupId
      *
      * @throws AccessDeniedHttpException
      */
-    public function add($groupId, $userId) {
+    public function add($userId, $groupId) {
         try
         {
             $this->table->insert(
-                [self::GROUP_ID => $groupId, self::USER_ID => $userId]
+                [self::USER_ID => $userId, self::GROUP_ID => $groupId]
             );
         }
         catch (Exception $e)
@@ -84,15 +62,15 @@ class MemberModel extends BaseModel {
     /**
      * Remove a user from a particular group.
      *
-     * @param $groupId
      * @param $userId
+     * @param $groupId
      *
      * @return int
      */
-    public function remove($groupId, $userId) {
+    public function delete($userId, $groupId) {
         return $this->table
-            ->where(self::GROUP_ID, $groupId)
             ->where(self::USER_ID, $userId)
+            ->where(self::GROUP_ID, $groupId)
             ->delete();
     }
 
