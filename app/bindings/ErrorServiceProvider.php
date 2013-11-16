@@ -16,7 +16,7 @@ class ErrorServiceProvider extends ServiceProvider {
         $this->app->error(function(HttpException $e)
         {
             // Show a message if there is one, otherwise display the status code.
-            return Response::json(['error' => $e->getMessage() ?: $e->getStatusCode()], $e->getStatusCode());
+            return Response::json(['error' => ($e->getMessage() ?: $e->getStatusCode())], $e->getStatusCode());
         });
     }
 
