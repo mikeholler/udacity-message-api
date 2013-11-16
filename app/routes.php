@@ -11,6 +11,54 @@
 |
 */
 
+// Verify the given user actually exists.
+Route::bind('users', function ($userId, $route)
+{
+    $userModel = App::make('UserModel');
+    $user = $userModel->getOne($userId);
+
+    if ($user)
+    {
+        return $userId;
+    }
+    else
+    {
+        return null;
+    }
+});
+
+// Verify the given group actually exists.
+Route::bind('groups', function ($groupId, $route)
+{
+    $groupModel = App::make('GroupModel');
+    $group = $groupModel->getOne($groupId);
+
+    if ($group)
+    {
+        return $groupId;
+    }
+    else
+    {
+        return null;
+    }
+});
+
+// Verify the a given member is actually a user.
+Route::bind('members', function ($memberId, $route)
+{
+    $userModel = App::make('UserModel');
+    $user = $userModel->getOne($memberId);
+
+    if ($user)
+    {
+        return $memberId;
+    }
+    else
+    {
+        return null;
+    }
+});
+
 Route::resource('users', 'UserController', ['only' => ['index', 'show', 'store', 'destroy']]);
 Route::get('users/{users}/groups', 'UserController@showGroups');
 Route::post('users/{users}/send', 'UserController@sendMessage');

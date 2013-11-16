@@ -50,7 +50,7 @@ class GroupControllerTest extends TestCase {
 
     public function testShow() {
         $data = ['key' => 'value'];
-        $this->groupModel->shouldReceive('getOne')->once()
+        $this->groupModel->shouldReceive('getOne')
             ->with(1)->andReturn($data);
 
         $response = $this->call('GET', 'groups/1');
@@ -60,6 +60,7 @@ class GroupControllerTest extends TestCase {
     }
 
     public function testDestroy() {
+        $this->groupModel->shouldReceive('getOne')->with(1)->andReturn(1);
         $this->groupModel->shouldReceive('delete')->once()
             ->with(1);
 

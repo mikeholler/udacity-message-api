@@ -9,14 +9,29 @@ class MemberControllerTest extends TestCase {
      */
     protected $memberModel;
 
+    /**
+     * @var m\Mock
+     */
+    protected $userModel;
+
+    /**
+     * @var m\Mock
+     */
+    protected $groupModel;
+
     public function setUp() {
         parent::setUp();
 
         $this->memberModel = $this->mock('MemberModel');
+
+        // Need to mock this for model binding.
+        $this->userModel = $this->mock('UserModel');
+        $this->groupModel = $this->mock('GroupModel');
     }
 
     public function testIndex() {
         $data = ['data'];
+        $this->groupModel->shouldReceive('getOne')->with(1)->andReturn(1);
         $this->memberModel->shouldReceive('getAll')->once()
             ->andReturn($data);
 
@@ -27,6 +42,9 @@ class MemberControllerTest extends TestCase {
     }
 
     public function testUpdate() {
+        $this->groupModel->shouldReceive('getOne')->with(2)->andReturn(2);
+        $this->userModel->shouldReceive('getOne')->andReturn(1);
+
         $this->memberModel->shouldReceive('add')->once()
             ->with(1, 2)->andReturn(null);
 
@@ -36,6 +54,9 @@ class MemberControllerTest extends TestCase {
     }
 
     public function testDestroy() {
+        $this->groupModel->shouldReceive('getOne')->with(2)->andReturn(2);
+        $this->userModel->shouldReceive('getOne')->andReturn(1);
+
         $this->memberModel->shouldReceive('delete')->once()
             ->with(1, 2);
 

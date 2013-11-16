@@ -9,10 +9,16 @@ class InboxControllerTest extends TestCase {
      */
     protected $messageModel;
 
+    /**
+     * @var m\Mock
+     */
+    protected $userModel;
+
     public function setUp() {
         parent::setUp();
 
         $this->messageModel = $this->mock('MessageModel');
+        $this->userModel = $this->mock('UserModel');
     }
 
     public function tearDown() {
@@ -22,6 +28,7 @@ class InboxControllerTest extends TestCase {
 
     public function testIndex() {
         $data = ['data'];
+        $this->userModel->shouldReceive('getOne')->once()->with(1)->andReturn(1);
         $this->messageModel->shouldReceive('getInbox')->once()
             ->andReturn($data);
 
@@ -33,6 +40,7 @@ class InboxControllerTest extends TestCase {
 
     public function testShow() {
         $data = ['key' => 'value'];
+        $this->userModel->shouldReceive('getOne')->once()->with(1)->andReturn(1);
         $this->messageModel->shouldReceive('getMessage')->once()
             ->with(1, 2)->andReturn($data);
 
@@ -43,6 +51,7 @@ class InboxControllerTest extends TestCase {
     }
 
     public function testDelete() {
+        $this->userModel->shouldReceive('getOne')->once()->with(1)->andReturn(1);
         $this->messageModel->shouldReceive('deleteMessage')->once()
             ->with(1, 2)->andReturn(null);
 

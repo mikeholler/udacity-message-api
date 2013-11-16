@@ -64,7 +64,7 @@ class UserControllerTest extends TestCase {
 
     public function testShow() {
         $data = ['key' => 'value'];
-        $this->userModel->shouldReceive('getOne')->once()->with(1)
+        $this->userModel->shouldReceive('getOne')->with(1)
             ->andReturn($data);
 
         $response = $this->call(
@@ -78,6 +78,7 @@ class UserControllerTest extends TestCase {
 
     public function testShowGroups() {
         $data = ['data'];
+        $this->userModel->shouldReceive('getOne')->once()->with(1)->andReturn(1);
         $this->userModel->shouldReceive('getGroups')->once()
             ->with(1)->andReturn($data);
 
@@ -88,8 +89,8 @@ class UserControllerTest extends TestCase {
     }
 
     public function testDestroy() {
-        $this->userModel->shouldReceive('delete')->once()
-            ->with(1);
+        $this->userModel->shouldReceive('getOne')->once()->with(1)->andReturn(1);
+        $this->userModel->shouldReceive('delete')->once()->with(1);
 
         $this->call('DELETE', 'users/1');
 
@@ -103,6 +104,7 @@ class UserControllerTest extends TestCase {
             'body' => 'body'
         ];
 
+        $this->userModel->shouldReceive('getOne')->once()->with(1)->andReturn(1);
         $this->messageModel->shouldReceive('sendMessage')->once()
             ->with(1, m::type('SendMessageStruct'));
 
